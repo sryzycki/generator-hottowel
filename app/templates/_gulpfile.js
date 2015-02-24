@@ -3,6 +3,7 @@ var browserSync = require('browser-sync');
 var config = require('./gulp.config')();
 var del = require('del');
 var glob = require('glob');
+var gp = require('gulp-protractor');
 var gulp = require('gulp');
 var path = require('path');
 var _ = require('lodash');
@@ -321,6 +322,15 @@ gulp.task('autotest', function(done) {
 });
 
 /**
+ * Run e2e specs
+ *
+ * @return {Stream}
+ */
+gulp.task('test-e2e', ['vet'], function(done) {
+    runProtractor(done);
+});
+
+/**
  * serve the dev environment
  * --debug-brk or --debug
  * --nosync
@@ -566,6 +576,8 @@ function startTests(singleRun, done) {
     var fork = require('child_process').fork;
     var karma = require('karma').server;
     var serverSpecs = config.serverIntegrationSpecs;
+    var e2eSpecs = [config.scenarios];
+    var allSpecs = [].concat(serverSpecs, e2eSpecs);
 
     if (args.startServers) {
         log('Starting servers');
@@ -574,8 +586,8 @@ function startTests(singleRun, done) {
         savedEnv.PORT = 8888;
         child = fork(config.nodeServer);
     } else {
-        if (serverSpecs && serverSpecs.length) {
-            excludeFiles = serverSpecs;
+        if (allSpecs && allSpecs.length) {
+            excludeFiles = allSpecs;
         }
     }
 
@@ -599,6 +611,31 @@ function startTests(singleRun, done) {
             done();
         }
     }
+}
+
+/**
+ * Start the tests using Protractor.
+ * @param  {Function} done - Callback to fire when Protractor is done
+ * @return {Stream}
+ */
+function runProtractor(done) {
+    log('Running e2e specs...');
+
+    return gulp
+        .src([config.scenarios], {read:false})
+        .pipe($.plumber())
+        .pipe(gp.protractor({
+            configFile: './protractor.conf.js'
+        }))
+        .on('error', function() {
+            log('Protractor error.');
+            done();
+        })
+        .on('end', function() {
+            log('Protractor end.');
+            done();
+        })
+        ;
 }
 
 /**

@@ -1,5 +1,10 @@
 #generator-hottowel
 
+## 0.2.6 - End to End
+
+### Features
+- Added "test-e2e" gulp task that uses Protractor
+
 ## 0.2.5 - Path Clarity
 
 ### Features

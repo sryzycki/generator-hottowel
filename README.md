@@ -181,6 +181,10 @@ The `blocks.router` module contains a routing helper module that assists in addi
 
     Runs a watch to run all unit tests and midway tests. Cranks up a second node process to run a server for the midway tests to hit a web api.
 
+- `gulp test-e2e`
+
+    Runs all e2e tests using [Protractor](http://www.protractortest.org/). Depends on vet task.
+
 ### Cleaning Up
 
 - `gulp clean`
